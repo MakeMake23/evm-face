@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>evm-face</title>
+    </head>
+    <body>
+        <div>
+            <input
+                id="contract-address"
+                type="text"
+                placeholder="contract address"
+            />
+        </div>
+        <div>
+            <input id="new-owner" type="text" placeholder="new owner" />
+        </div>
+        <button id="transfer-ownership-button" type="submit">
+            Transfer ownership
+        </button>
+
+        <script type="module">
+            import { ethers } from "https://cdn.ethers.io/lib/ethers-5.2.esm.min.js";
+
+            async function setUp() {
+                let signer;
+                if (typeof window.ethereum !== "undefined") {
+                    await requestAccount();
+                    console.log(ethers);
+                    const provider = new ethers.providers.Web3Provider(
+                        window.ethereum
+                    );
+
+                    signer = provider.getSigner();
+                    console.log("Connected", await signer.getAddress());
+                } else {
+                    throw new Error("Please install MetaMask!");
+                }
+
+                const transferOwnershipButton = document.getElementById(
+                    "transfer-ownership-button"
+                );
+                transferOwnershipButton.addEventListener("click", async () => {
+                    try {
+                        const contractAddress =
+                            document.getElementById("contract-address").value;
+                        const abi = [
+                            {
+                                inputs: [
+                                    {
+                                        internalType: "address",
+                                        name: "newOwner",
+                                        type: "address",
+                                    },
+                                ],
+                                name: "transferOwnership",
+                                outputs: [],
+                                stateMutability: "nonpayable",
+                                type: "function",
+                            },
+                        ];
+                        console.log(contractAddress);
+                        const contract = new ethers.Contract(
+                            contractAddress,
+                            abi,
+                            signer
+                        );
+                        const newOwner =
+                            document.getElementById("new-owner").value;
+                        const txResponse = await contract.transferOwnership(
+                            newOwner
+                        );
+                        const txReceipt = await txResponse.wait();
+                        console.log("Transaction receipt:", txReceipt);
+                        console.log("Ownership transferred");
+                    } catch (e) {
+                        console.error(e);
+                    }
+                });
+            }
+
+            async function requestAccount() {
+                console.log("Requesting account...");
+
+                // Request account access if needed
+                await window.ethereum.request({
+                    method: "eth_requestAccounts",
+                });
+            }
+
+            window.onload = setUp;
+        </script>
+    </body>
+</html>
