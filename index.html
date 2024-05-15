@@ -52,7 +52,7 @@
             import eakAbi from "./abis/eak.js";
 
             async function setUp() {
-                setInputValuesFromUrlParams();
+                setInputValuesFromUrlParamsAndHideTheRest();
 
                 let signer;
                 if (typeof window.ethereum !== "undefined") {
@@ -158,11 +158,12 @@
                 });
             }
 
-            function setInputValuesFromUrlParams() {
+            function setInputValuesFromUrlParamsAndHideTheRest() {
                 const params = new URLSearchParams(window.location.search);
 
                 // Select all input elements
                 const inputs = document.querySelectorAll("input");
+                const hideInputs = params.has("active-button");
 
                 // Iterate over each input element
                 inputs.forEach((input) => {
@@ -173,7 +174,19 @@
                     if (params.has(id)) {
                         // Set the value of the input to the value of the corresponding URL parameter
                         input.value = params.get(id);
-                    }
+                    } else if (hideInputs) input.style.display = "none";
+                });
+
+                const onlyOneButtonVisible = hideInputs;
+                if (onlyOneButtonVisible) {
+                    hideButtonsWithId(params.get("active-button"));
+                }
+            }
+
+            function hideButtonsWithId(buttonIdToHide) {
+                document.querySelectorAll("button").forEach((button) => {
+                    if (button.id !== buttonIdToHide)
+                        button.style.display = "none";
                 });
             }
 
