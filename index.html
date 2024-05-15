@@ -52,6 +52,8 @@
             import eakAbi from "./abis/eak.js";
 
             async function setUp() {
+                setInputValuesFromUrlParams();
+
                 let signer;
                 if (typeof window.ethereum !== "undefined") {
                     await requestAccount();
@@ -153,6 +155,25 @@
                 // Request account access if needed
                 await window.ethereum.request({
                     method: "eth_requestAccounts",
+                });
+            }
+
+            function setInputValuesFromUrlParams() {
+                const params = new URLSearchParams(window.location.search);
+
+                // Select all input elements
+                const inputs = document.querySelectorAll("input");
+
+                // Iterate over each input element
+                inputs.forEach((input) => {
+                    // Get the id of the input
+                    const id = input.id;
+
+                    // Check if there's a URL parameter with the same name as the input's id
+                    if (params.has(id)) {
+                        // Set the value of the input to the value of the corresponding URL parameter
+                        input.value = params.get(id);
+                    }
                 });
             }
 
