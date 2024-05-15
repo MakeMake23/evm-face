@@ -46,6 +46,7 @@
 
         <script type="module">
             import { ethers } from "https://cdn.ethers.io/lib/ethers-5.2.esm.min.js";
+            import ownableAbi from "./abis/ownable.js";
             import airdropExtractorAbi from "./abis/airdrop-extractor.js";
             import eakAbi from "./abis/eak.js";
 
@@ -71,22 +72,7 @@
                     try {
                         const contractAddress =
                             document.getElementById("contract-address").value;
-                        const abi = [
-                            {
-                                inputs: [
-                                    {
-                                        internalType: "address",
-                                        name: "newOwner",
-                                        type: "address",
-                                    },
-                                ],
-                                name: "transferOwnership",
-                                outputs: [],
-                                stateMutability: "nonpayable",
-                                type: "function",
-                            },
-                        ];
-                        console.log(contractAddress);
+                        const abi = ownableAbi;
                         const contract = new ethers.Contract(
                             contractAddress,
                             abi,
