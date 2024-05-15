@@ -17,12 +17,29 @@
         <div>
             <input id="new-owner" type="text" placeholder="new owner" />
         </div>
-        <button id="transfer-ownership-button" type="submit">
-            Transfer ownership
-        </button>
+        <button id="transfer-ownership-button">Transfer ownership</button>
+        <div>
+            <input
+                id="airdrop-address"
+                type="text"
+                placeholder="airdrop address"
+            />
+        </div>
+        <div>
+            <input id="to" type="text" placeholder="to" />
+        </div>
+        <div>
+            <input id="start-id" type="number" placeholder="start id" />
+        </div>
+        <div>
+            <input id="end-id" type="number" placeholder="end id" />
+        </div>
+        <button id="batch-transfer-nfts">Batch transfer NFTs</button>
+
 
         <script type="module">
             import { ethers } from "https://cdn.ethers.io/lib/ethers-5.2.esm.min.js";
+            import airdropExtractorAbi from "./abis/airdrop-extractor.js";
 
             async function setUp() {
                 let signer;
@@ -78,6 +95,35 @@
                     } catch (e) {
                         console.error(e);
                     }
+                });
+
+                const batchTransferNfts = document.getElementById(
+                    "batch-transfer-nfts"
+                );
+                batchTransferNfts.addEventListener("click", async () => {
+                    const contractAddress =
+                        document.getElementById("contract-address").value;
+
+                    const abi = airdropExtractorAbi;
+                    const contract = new ethers.Contract(
+                        contractAddress,
+                        abi,
+                        signer
+                    );
+                    const airdropAddress =
+                        document.getElementById("airdrop-address").value;
+                    const to = document.getElementById("to").value;
+                    const startId = document.getElementById("start-id").value;
+                    const endId = document.getElementById("end-id").value;
+                    const txResponse = await contract.batchTransferNFTs(
+                        airdropAddress,
+                        to,
+                        startId,
+                        endId
+                    );
+                    const txReceipt = await txResponse.wait();
+                    console.log("Transaction receipt:", txReceipt);
+                    console.log("batchTransfer done!");
                 });
             }
 
