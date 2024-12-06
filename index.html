@@ -45,11 +45,16 @@
         </div>
         <button id="mint-batch">Mint batch</button>
 
+        <div>
+            <button id="deposit">Deposit</button>
+        </div>
+
         <script type="module">
             import { ethers } from "https://cdn.ethers.io/lib/ethers-5.2.esm.min.js";
             import ownableAbi from "./abis/ownable.js";
             import airdropExtractorAbi from "./abis/airdrop-extractor.js";
             import eakAbi from "./abis/eak.js";
+            import wethAbi from "./abis/weth.js";
 
             async function setUp() {
                 setInputValuesFromUrlParamsAndHideTheRest();
@@ -146,6 +151,27 @@
                     const txReceipt = await txResponse.wait();
                     console.log("Transaction receipt:", txReceipt);
                     console.log("mint batch done!");
+                });
+
+                const depositButton = document.getElementById("deposit");
+                depositButton.addEventListener("click", async () => {
+                    const contractAddress =
+                        document.getElementById("contract-address").value;
+
+                    const abi = wethAbi;
+                    const contract = new ethers.Contract(
+                        contractAddress,
+                        abi,
+                        signer
+                    );
+                    const amount = document.getElementById("amount").value;
+
+                    const txResponse = await contract.deposit({
+                        value: ethers.utils.parseEther(amount),
+                    });
+                    const txReceipt = await txResponse.wait();
+                    console.log("Transaction receipt:", txReceipt);
+                    console.log("deposit done!");
                 });
             }
 
