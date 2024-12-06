@@ -49,12 +49,21 @@
             <button id="deposit">Deposit</button>
         </div>
 
+        <div>
+            <input id="name" type="text" placeholder="name" />
+        </div>
+        <div>
+            <input id="symbol" type="text" placeholder="symbol" />
+        </div>
+        <button id="create-erc20">Create ERC-20</button>
+
         <script type="module">
-            import { ethers } from "https://cdn.ethers.io/lib/ethers-5.2.esm.min.js";
+            import { ethers } from "https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.esm.min.js";
             import ownableAbi from "./abis/ownable.js";
             import airdropExtractorAbi from "./abis/airdrop-extractor.js";
             import eakAbi from "./abis/eak.js";
             import wethAbi from "./abis/weth.js";
+            import erc20FactoryAbi from "./abis/erc20-factory.js";
 
             async function setUp() {
                 setInputValuesFromUrlParamsAndHideTheRest();
@@ -172,6 +181,38 @@
                     const txReceipt = await txResponse.wait();
                     console.log("Transaction receipt:", txReceipt);
                     console.log("deposit done!");
+                });
+
+                const createErc20Button =
+                    document.getElementById("create-erc20");
+                createErc20Button.addEventListener("click", async () => {
+                    const contractAddress =
+                        document.getElementById("contract-address").value;
+
+                    const abi = erc20FactoryAbi;
+                    const contract = new ethers.Contract(
+                        contractAddress,
+                        abi,
+                        signer
+                    );
+                    const name = document.getElementById("name").value;
+                    const symbol = document.getElementById("symbol").value;
+                    const totalSupplyInBits =
+                        document.getElementById("amount").value;
+                    const fee = await contract.getFee();
+
+                    const txResponse =
+                        await contract.createERC20WithTotalSupply(
+                            name,
+                            symbol,
+                            ethers.utils.parseEther(totalSupplyInBits),
+                            { value: fee }
+                        );
+                    const txReceipt = await txResponse.wait();
+                    console.log("Transaction receipt:", txReceipt);
+
+                    const tokenAddress = txReceipt.events[1].args[0];
+                    console.log(`ERC-20 created at ${tokenAddress}`);
                 });
             }
 
