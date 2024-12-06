@@ -205,11 +205,11 @@
 
                 const onlyOneButtonVisible = hideInputs;
                 if (onlyOneButtonVisible) {
-                    hideButtonsWithId(params.get("active-button"));
+                    hideButtonsWithIdNeqTo(params.get("active-button"));
                 }
             }
 
-            function hideButtonsWithId(buttonIdToHide) {
+            function hideButtonsWithIdNeqTo(buttonIdToHide) {
                 document.querySelectorAll("button").forEach((button) => {
                     if (button.id !== buttonIdToHide)
                         button.style.display = "none";
