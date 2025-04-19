@@ -57,6 +57,11 @@
         </div>
         <button id="create-erc20">Create ERC-20</button>
 
+        <div>
+            <input id="tx-id" type="number" placeholder="tx id" />
+        </div>
+        <button id="approve-multisig-tx">Approve Multisig Tx</button>
+
         <script type="module">
             import { ethers } from "https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.esm.min.js";
             import ownableAbi from "./abis/ownable.js";
@@ -64,6 +69,7 @@
             import eakAbi from "./abis/eak.js";
             import wethAbi from "./abis/weth.js";
             import erc20FactoryAbi from "./abis/erc20-factory.js";
+            import multisigAbi from "./abis/multisig.js";
 
             async function setUp() {
                 setInputValuesFromUrlParamsAndHideTheRest();
@@ -213,6 +219,25 @@
 
                     const tokenAddress = txReceipt.events[1].args[0];
                     console.log(`ERC-20 created at ${tokenAddress}`);
+                });
+
+                const approveMultisigTxButton = document.getElementById(
+                    "approve-multisig-tx"
+                );
+                approveMultisigTxButton.addEventListener("click", async () => {
+                    const contractAddress =
+                        document.getElementById("contract-address").value;
+                    const abi = multisigAbi;
+                    const contract = new ethers.Contract(
+                        contractAddress,
+                        abi,
+                        signer
+                    );
+                    const txId = document.getElementById("tx-id").value;
+                    const txResponse = await contract.approveTransaction(txId);
+                    const txReceipt = await txResponse.wait();
+                    console.log("Transaction receipt:", txReceipt);
+                    console.log("Multisig tx approved!");
                 });
             }
 
